@@ -1,0 +1,50 @@
+﻿@model Designation
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<form id="editForm" asp-action="Edit" asp-controller="Designation">
+    <input type="hidden" asp-for="DesigId" id="Edit_ComId" /> <!-- Hidden field to store Company ID -->
+
+    <div class="mb-3">
+        <label asp-for="DesigName" class="form-label">Department Name</label>
+        <input type="text" asp-for="DesigName" class="form-control" id="Edit_ComName">
+    </div>
+
+    <button type="submit" class="btn btn-primary" onclick="submitEditForm()">Save Changes</button>
+</form>
+
+<!-- Rest of your view content -->
+@section Scripts {
+    <script>
+        function editRow(index) {
+            var row = table.getRow(index);
+            var rowData = row.getData();
+
+            // Populate the edit form with the selected row's data
+            populateEditForm(rowData);
+
+            // Open the edit modal
+            $('#editModal').modal('show');
+        }
+
+        function submitEditForm() {
+            $.ajax({
+                url: '/Designation/Edit',
+                type: 'POST',
+                data: $('#editForm').serialize(),
+                success: function (data) {
+                    // Update the row in the table with the edited data
+
+                    // Close the edit modal
+                    $('#editModal').modal('hide');
+                },
+                error: function () {
+                    console.error('Error submitting edit form.');
+                }
+            });
+        }
+    </script>
+}

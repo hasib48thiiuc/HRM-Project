@@ -1,0 +1,125 @@
+﻿@model CompanyDTO
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<form id="createForm" asp-action="Create" asp-controller="Company">
+    <!-- Your form fields go here -->
+    <div class="mb-3">
+        <label asp-for="ComName" class="form-label">Company Name</label>
+        <input type="text" asp-for="ComName" class="form-control" id="ComName" required>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Basic" class="form-label">Basic Percentage</label>
+        <input type="number" asp-for="Basic" class="form-control" id="Basic" required>
+    </div>
+    <div class="mb-3">
+        <label asp-for="HRent" class="form-label">HRent Percentage</label>
+        <input type="number" asp-for="HRent" class="form-control" id="HRent" required>
+    </div>
+    <div class="mb-3">
+        <label asp-for="medical" class="form-label">Medical Percentage</label>
+        <input type="number" asp-for="medical" class="form-control" id="Medical" required>
+    </div>
+    <div class="mb-3 form-check"> 
+        <input type="checkbox" asp-for="IsInactive" class="form-check-input" id="IsInactive" required>
+        <label class="form-check-label" asp-for="IsInactive">Is Inactive</label>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
+</form>
+
+<!-- Table to display items -->
+<div id="tableContainer"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://unpkg.com/tabulator-tables@5.0.6/dist/js/tabulator.min.js"></script>
+
+<script>
+    var table;
+
+    $(document).ready(function () {
+        fetchDataFromServer();
+    });
+
+    function fetchDataFromServer() {
+        var url = '/Company/GetAll';
+        return $.ajax({
+            url: url,
+            dataType: "json",
+        }).done(function (response) {
+            console.log("Normal response:", response);
+            var dataTable = response;
+
+            initializeOrUpdateTable(dataTable);
+        });
+    }
+
+    function initializeOrUpdateTable(dataTable) {
+        if (!table) {
+            table = new Tabulator("#tableContainer", {
+                data: dataTable,
+                layout: "fitColumns",
+                frozenRows: 1,
+                columns: [
+                    { title: 'comId', field: 'comId', visible: false },
+                    { title: 'Company Name', field: 'comName' },
+                    { title: 'Basic Percentage', field: 'basic' },
+                    { title: 'HRent Percentage', field: 'hRent' },
+                    { title: 'Medical Percentage', field: 'medical' },
+                    { title: 'Is Inactive', field: 'isInactive' },
+                    {
+                        title: "Actions",
+                        formatter: function (cell, formatterParams, onRendered) {
+                            var rowData = cell.getRow().getData();
+                            console.log('Row data:', rowData);
+                            return '<button class="btn btn-sm btn-primary" onclick="editRow(' + rowData.comId + ')">Edit</button>' +
+                                '<button class="btn btn-sm btn-danger" onclick="deleteRow(' + rowData.comId + ')">Delete</button>';
+                        },
+                        headerSort: false,
+                        align: 'center',
+                        width: 150,
+                    },
+                ],
+                dataBound: function () {
+                    var rows = table.getRows();
+                    if (rows.length > 0) {
+                        var cells = rows[0].getCells();
+                        cells.forEach(cell => {
+                            cell.freeze();
+                        });
+                    }
+                },
+            });
+        } else {
+            table.setData(dataTable);
+        }
+    }
+
+    function submitForm() {
+        $.ajax({
+            url: '/Company/Create',
+            type: 'POST',
+            data: $('#createForm').serialize(),
+            success: function (data) {
+              $('#createForm')[0].reset();
+
+                fetchDataFromServer();
+            },
+            error: function () {
+                console.error('Error submitting form.');
+            }
+        });
+    }
+
+    function editRow(id) {
+        window.location.href = '/Company/Edit/' + id;
+    }
+
+    function deleteRow(id) {
+        window.location.href = '/Company/Delete/' + id;
+
+        console.log('Delete clicked for row with ID:', id);
+    }
+</script>

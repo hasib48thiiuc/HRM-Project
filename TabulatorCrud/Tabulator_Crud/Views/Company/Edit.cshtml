@@ -1,0 +1,65 @@
+﻿@model Company;
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit Company</h1>
+
+<form id="editForm" asp-action="Edit" asp-controller="Company">
+    <input type="hidden" asp-for="ComId" id="Edit_ComId" /> <!-- Hidden field to store Company ID -->
+
+    <div class="mb-3">
+        <label asp-for="ComName" class="form-label">Company Name</label>
+        <input type="text" asp-for="ComName" class="form-control" id="Edit_ComName">
+    </div>
+    <div class="mb-3">
+        <label asp-for="Basic" class="form-label">Basic Percentage</label>
+        <input type="number" asp-for="Basic" class="form-control" id="Edit_Basic">
+    </div>
+    <div class="mb-3">
+        <label asp-for="HRent" class="form-label">HRent Percentage</label>
+        <input type="number" asp-for="HRent" class="form-control" id="Edit_HRent">
+    </div>
+    <div class="mb-3">
+        <label asp-for="medical" class="form-label">Medical Percentage</label>
+        <input type="number" asp-for="medical" class="form-control" id="Edit_Medical">
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" asp-for="IsInactive" class="form-check-input" id="Edit_IsInactive">
+        <label class="form-check-label" asp-for="IsInactive">Is Inactive</label>
+    </div>
+    <button type="submit" class="btn btn-primary" onclick="submitEditForm()">Save Changes</button>
+</form>
+
+<!-- Rest of your view content -->
+@section Scripts {
+    <script>
+        function editRow(index) {
+            var row = table.getRow(index);
+            var rowData = row.getData();
+
+            // Populate the edit form with the selected row's data
+            populateEditForm(rowData);
+
+            // Open the edit modal
+            $('#editModal').modal('show');
+        }
+
+        function submitEditForm() {
+            $.ajax({
+                url: '/Company/Edit',
+                type: 'POST',
+                data: $('#editForm').serialize(),
+                success: function (data) {
+                    // Update the row in the table with the edited data
+                   
+                    // Close the edit modal
+                    $('#editModal').modal('hide');
+                },
+                error: function () {
+                    console.error('Error submitting edit form.');
+                }
+            });
+        }
+    </script>
+}

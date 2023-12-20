@@ -1,0 +1,52 @@
+﻿<div id="attendanceTable"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.1.0/js/tabulator.min.js"></script>
+
+<script>
+    function fetchAttendanceData() {
+        return $.ajax({
+            url: '/Attendance/GetAttendanceData', // Replace with your action endpoint
+            dataType: 'json'
+        });
+    }
+
+    // Fetch data and create the Tabulator table
+    fetchAttendanceData().done(function (response) {
+        var data = response;
+  
+        console.log("data table:", data);
+        var table = new Tabulator("#attendanceTable", {
+            data: data,
+            layout: "fitColumns",
+            columns: [
+                { title: "Company ID", field: "comId", visible: false }, // Hide if you don't want to display
+                { title: "Employee ID", field: "empId", visible: false },
+                { title: "Employee Name", field: "employee.empName"},
+                { title: "Date", field: "dtDate"},
+                { title: "Attendance Status", field: "attStatus" },
+                { title: "In Time", field: "inTime"},
+                { title: "Out Time", field: "outTime" },
+                {
+                    title: "Actions",
+                    formatter: function (cell, formatterParams, onRendered) {
+                        return '<button class="btn btn-sm btn-info" onclick="editAttendance(' + cell.getData().empId + ')">Edit</button>' +
+                            '<button class="btn btn-sm btn-danger" onclick="deleteAttendance(' + cell.getData().empId + ')">Delete</button>';
+                    }
+                }
+            ]
+        });
+    }).fail(function (error) {
+        console.error("Error fetching attendance data:", error);
+    });
+
+    function editAttendance(empId) {
+        // Add logic to handle editing attendance for the specified empId
+        console.log("Edit clicked for Employee ID: ", empId);
+    }
+
+    function deleteAttendance(empId) {
+        // Add logic to handle deleting attendance for the specified empId
+        console.log("Delete clicked for Employee ID: ", empId);
+    }
+</script>

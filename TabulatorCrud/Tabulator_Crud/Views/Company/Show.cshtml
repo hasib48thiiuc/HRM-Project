@@ -1,0 +1,91 @@
+﻿@model List<Company>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select a Company</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+        }
+
+        #companyButtons {
+            max-width: 400px; /* Set the maximum width of the buttons container */
+            margin: 0 auto; /* Center the container horizontally */
+            padding: 20px; /* Add some padding */
+            background-color: #ffffff; /* White background */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle lift */
+            text-align: center; /* Center the buttons */
+            margin-top: 50px; /* Add some top margin */
+        }
+
+        .companyButton {
+            margin-bottom: 10px; /* Add margin between buttons */
+            background-color: #ffc107; /* Light orange background */
+            color: #ffffff; /* White text color */
+            border: none; /* Remove border */
+            padding: 10px 20px; /* Add padding */
+            font-size: 16px; /* Increase font size */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Change cursor on hover */
+            transition: background-color 0.3s; /* Smooth background color transition */
+        }
+
+            .companyButton:hover {
+                background-color: #fd7e14; /* Darker orange on hover */
+            }
+
+        h1 {
+            text-align: center; /* Center the header */
+            color: #007bff; /* Blue header color */
+            margin-bottom: 30px; /* Add bottom margin */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Select a Company</h1>
+
+    <div id="companyButtons" class="mb-3">
+        @foreach (var company in Model)
+        {
+            <button class="companyButton" data-id="@company.ComId">@company.ComName</button>
+        }
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Attach click event handler to company buttons
+            $(".companyButton").on("click", function () {
+                var selectedCompanyId = $(this).data("id");
+                saveSelectedCompanyToSession(selectedCompanyId);
+            });
+        });
+
+        function saveSelectedCompanyToSession(selectedCompanyId) {
+            // Perform AJAX request to save selected company to session
+            $.ajax({
+                url: '/Company/SaveSelectedCompanyToSession',
+                type: 'POST',
+                data: { companyId: selectedCompanyId },
+                success: function (data) {
+                    console.log('Response data', data);
+                    var companyName = data.companyName;
+                    alert('Selected Company: ' + companyName);
+                    window.location.href = '/Department/Create'; // Change this to the URL of the other controller's action
+                },
+                error: function () {
+                    console.error('Error saving selected company to session.');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

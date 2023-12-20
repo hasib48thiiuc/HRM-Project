@@ -1,0 +1,104 @@
+﻿ 
+@model Designation;
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create Designation</h1>
+
+<form id="createForm" asp-action="Create" asp-controller="Designation">
+    <div class="mb-3">
+        <label asp-for="DesigName" class="form-label">Department Name</label>
+        <input type="text" asp-for="DesigName" class="form-control" id="DesigName">
+    </div>
+
+
+
+    <button type="button" class="btn btn-primary mb-3" onclick="submitForm()">Submit</button>
+</form>
+
+<div id="tableContainer"></div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://unpkg.com/tabulator-tables@5.0.6/dist/js/tabulator.min.js"></script>
+<script>
+    var table;
+
+    $(document).ready(function () {
+        fetchDataFromServer();
+    });
+    function fetchDataFromServer() {
+        var url = '/Designation/GetAll';
+        return $.ajax({
+            url: url,
+            dataType: "json",
+        }).done(function (response) {
+            console.log("Normal response:", response);
+            var dataTable = response;
+
+            initializeOrUpdateTable(dataTable);
+        });
+    }
+    function initializeOrUpdateTable(dataTable) {
+        if (!table) {
+            table = new Tabulator("#tableContainer", {
+                data: dataTable,
+                layout: "fitColumns",
+                frozenRows: 1,
+                columns: [
+                    { title: 'deptId', field: 'deptId', visible: false },
+                    { title: 'Designation Name', field: 'desigName' },
+                    {
+                        title: "Actions",
+                        formatter: function (cell, formatterParams, onRendered) {
+                            var rowData = cell.getRow().getData();
+                            console.log('Row data:', rowData);
+                            return '<button class="btn btn-sm btn-primary" onclick="editRow(' + rowData.desigId + ')">Edit</button>' +
+                                '<button class="btn btn-sm btn-danger" onclick="deleteRow(' + rowData.desigId + ')">Delete</button>';
+                        },
+                        headerSort: false,
+                        align: 'center',
+                        width: 150,
+                    },
+                ],
+                dataBound: function () {
+                    var rows = table.getRows();
+                    if (rows.length > 0) {
+                        var cells = rows[0].getCells();
+                        cells.forEach(cell => {
+                            cell.freeze();
+                        });
+                    }
+                },
+            });
+        } else {
+            table.setData(dataTable);
+        }
+    }
+
+    function submitForm() {
+        $.ajax({
+            url: '/Designation/Create',
+            type: 'POST',
+            data: $('#createForm').serialize(),
+            success: function (data) {
+                $('#createForm')[0].reset();
+
+                fetchDataFromServer();
+            },
+            error: function () {
+                console.error('Error submitting form.');
+            }
+        });
+    }
+
+    function editRow(id) {
+        window.location.href = '/Designation/Edit/' + id;
+    }
+
+    function deleteRow(id) {
+        window.location.href = '/Designation/Delete/' + id;
+
+        console.log('Delete clicked for row with ID:', id);
+    }
+
+</script>

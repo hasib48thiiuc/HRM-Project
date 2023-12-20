@@ -1,0 +1,78 @@
+﻿@model List<Tabulator_Crud.Models.Domain.AttendanceSummaryViewModel>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Summary</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.1.0/css/tabulator.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.1.0/js/tabulator.min.js"></script>
+
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="employeeTable"></div>
+
+    <script>
+        // Function to fetch data from the server
+        function fetchAttendanceSummaryData() {
+            return $.ajax({
+                url: '/Attendance/ShowSummary', // Replace with your action endpoint
+                dataType: 'json'
+            });
+        }
+
+        // Fetch data and create the Tabulator table
+        fetchAttendanceSummaryData().done(function (response) {
+            var data = response;
+
+            console.log("data table:", data);
+            var table = new Tabulator("#employeeTable", {
+                data: data,
+                layout: "fitColumns",
+                columns: [
+                    { title: "Employee ID", field: "empId", width: 150 },
+                    { title: "Employee Name", field: "empName" },
+                    { title: "Month", field: "month" },
+                    { title: "Present Count", field: "presentCount" },
+                    { title: "Absent Count", field: "absentCount" },
+                    { title: "Late Count", field: "lateCount" },
+                    {
+                        title: "Actions",
+                        headerSort: false,
+                        formatter: function (cell, formatterParams, onRendered) {
+                            var employeeId = cell.getRow().getData().empId;
+                            return '<button class="btn btn-sm btn-info" onclick="viewAttendance(' + employeeId + ')">Attendance</button>' +
+                                '<button class="btn btn-sm btn-primary" onclick="editRow(' + employeeId + ')">Edit</button>' +
+                                '<button class="btn btn-sm btn-danger" onclick="deleteEmployee(' + employeeId + ')">Delete</button>';
+                        },
+                        width: 200,
+                    },
+                ],
+            });
+        }).fail(function (error) {
+            console.error("Error fetching attendance summary data:", error);
+        });
+
+        function viewAttendance(id) {
+            window.location.href = '/Attendance/ShowSummary/' + id;
+        }
+
+        function editRow(id) {
+            window.location.href = '/Employee/Edit/' + id;
+        }
+
+        function deleteEmployee(id) {
+            // Add logic to handle deleting employee
+            window.location.href = '/Employee/Delete/' + id;
+        }
+    </script>
+</body>
+</html>

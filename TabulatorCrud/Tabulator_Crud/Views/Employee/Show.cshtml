@@ -1,0 +1,64 @@
+﻿
+    <div id="employeeTable"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.1.0/js/tabulator.min.js"></script>
+
+<script>
+    function fetchEmployeeData() {
+        return $.ajax({
+            url: '/Employee/GetAllEmployee',
+            dataType: 'json'
+        });
+    }
+
+    fetchEmployeeData().done(function (response) {
+        var data = response;
+
+        console.log("data table:", data);
+        var table = new Tabulator("#employeeTable", {
+            data: data,
+            layout: "fitColumns",
+            columns: [
+                { title: "Employee Name", field: "empName", width: 150 },
+                { title: "Employee Code", field: "empCode" },
+                { title: "Gender", field: "gender" },
+                { title: "Basic", field: "basic" },
+                { title: "HRent", field: "hRent" },
+                { title: "Medical", field: "medical" },
+                { title: "Gross", field: "gross" },
+                { title: "Department", field: "department.deptName" },
+                { title: "Designation", field: "designation.desigName" },
+                { title: "Shift", field: "shift.shiftName" },
+                {
+                    title: "Actions",
+                    headerSort: false,
+                    formatter: function (cell, formatterParams, onRendered) {
+                      
+                        var employeeId = cell.getRow().getData().empId;
+                        return '<button class="btn btn-sm btn-info" onclick="viewAttendance(' + employeeId+ ')">Attendance</button>' +
+                            '<button class="btn btn-sm btn-primary" onclick="editRow(' + employeeId + ')">Edit</button>' +
+                            '<button class="btn btn-sm btn-danger" onclick="deleteEmployee(' + employeeId + ')">Delete</button>';
+
+                    },
+                    width: 200,
+                },
+            ],
+        });
+    }).fail(function (error) {
+        console.error("Error fetching employee data:", error);
+    });
+
+    function viewAttendance(id) {
+        window.location.href = '/Attendance/ShowSummary/' + id;
+    }
+
+
+    function editRow(id) {
+        window.location.href = '/Employee/Edit/' + id;
+    }
+
+    function deleteEmployee(id) {
+        window.location.href = '/Employee/Delete/' + id;
+    }
+</script>

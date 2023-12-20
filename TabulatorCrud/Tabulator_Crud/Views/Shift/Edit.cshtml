@@ -1,0 +1,63 @@
+﻿@model Shift;
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create Shift</h1>
+
+<form id="editForm" asp-action="Edit" asp-controller="Shift">
+    <input type="hidden" asp-for="Id" id="Edit_ComId" /> <!-- Hidden field to store Company ID -->
+
+    <div class="mb-3">
+        <label asp-for="shiftName" class="form-label">Shift Name</label>
+        <input type="text" asp-for="shiftName" class="form-control" id="shiftName" required>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="shiftIn" class="form-label">Shift In</label>
+        <input type="time" asp-for="shiftIn" class="form-control" id="shiftIn" required>
+    </div>
+    <div class="mb-3">
+        <label asp-for="shiftOut" class="form-label">Shift Out</label>
+        <input type="time" asp-for="shiftOut" class="form-control" id="shiftOut" required>
+    </div>
+    <div class="mb-3">
+        <label asp-for="shiftLate" class="form-label">Shift Late</label>
+        <input type="time" asp-for="shiftLate" class="form-control" id="shiftLate" required>
+    </div>
+
+
+    <button type="button" class="btn btn-primary mb-3" onclick="submitEditForm()">Submit</button>
+</form>
+
+@section Scripts {
+    <script>
+        function editRow(index) {
+            var row = table.getRow(index);
+            var rowData = row.getData();
+
+            // Populate the edit form with the selected row's data
+            populateEditForm(rowData);
+
+            // Open the edit modal
+            $('#editModal').modal('show');
+        }
+
+        function submitEditForm() {
+            $.ajax({
+                url: '/Shift/Edit',
+                type: 'POST',
+                data: $('#editForm').serialize(),
+                success: function (data) {
+                    // Update the row in the table with the edited data
+
+                    // Close the edit modal
+                    $('#editModal').modal('hide');
+                },
+                error: function () {
+                    console.error('Error submitting edit form.');
+                }
+            });
+        }
+    </script>
+}

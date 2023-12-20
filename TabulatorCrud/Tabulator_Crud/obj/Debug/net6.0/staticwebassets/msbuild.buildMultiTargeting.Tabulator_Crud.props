@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Tabulator_Crud.props" />
+</Project>

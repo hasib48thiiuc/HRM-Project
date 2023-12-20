@@ -1,0 +1,81 @@
+﻿@model Tabulator_Crud.Models.Domain.Attendance
+
+@{
+    ViewData["Title"] = "Create Attendance";
+    var departments = ViewBag.Departments as List<Department>;
+}
+
+<h1>Create Attendance</h1>
+
+<form asp-action="Create" asp-controller="Attendance">
+
+    <div class="mb-3">
+        <label class="form-label">Department</label>
+        <select class="form-control" id="DeptId">
+            <option value="">Select Department</option>
+            @foreach (var department in departments)
+            {
+                <option value="@department.DeptId">@department.DeptName</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EmpId" class="form-label">Employee</label>
+        <select asp-for="EmpId" class="form-control" id="employeeDropdown">
+            <option value="">Select Employee</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DtDate" class="form-label">Date</label>
+        <input asp-for="DtDate" type="date" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="InTime" class="form-label">In Time</label>
+        <input asp-for="InTime" type="time" class="form-control" >
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="OutTime" class="form-label">Out Time</label>
+        <input asp-for="OutTime" type="time" class="form-control" >
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a href="/Attendance/Show">
+        <button type="button" class="btn btn-primary">Show Table</button>
+    </a>
+
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Event listener for department dropdown
+        $('#DeptId').on('change', function () {
+            var departmentId = $(this).val();
+            populateEmployeeDropdown(departmentId);
+        });
+
+        function populateEmployeeDropdown(departmentId) {
+            // Implement AJAX logic to fetch employees based on departmentId
+            $.ajax({
+                url: '/Attendance/GetEmployees',
+                type: 'GET',
+                data: { departmentId: departmentId },
+                success: function (data) {
+                    console.log('data received from server',data)
+                    $('#employeeDropdown').empty();
+                    $('#employeeDropdown').append($('<option>').val('').text('Select Employee'));
+                    data.forEach(function (employee) {
+                        $('#employeeDropdown').append($('<option>').val(employee.empId).text(employee.empName));
+                    });
+                },
+                error: function () {
+                    console.error('Error fetching employees.');
+                }
+            });
+        }
+    });
+</script>
